@@ -1,15 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import "./AllScenarios.css"; // Import the CSS for styling
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
 import scenariosData from "./data/scenarios"; // Import the scenarios data directly
+import vehiclesData from "./data/vehicles.json"; // Import the vehicles data
 
 function AllScenarios() {
   const [scenarios, setScenarios] = useState(scenariosData); // Define scenarios state
   const [editingScenario, setEditingScenario] = useState(null);
   const [editForm, setEditForm] = useState({ name: "", time: "", vehicles: 0 });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Count the number of vehicles for each scenario
+    const scenariosWithVehicleCounts = scenarios.map(scenario => {
+      const scenarioVehicles = vehiclesData.filter(vehicle => vehicle.scenario === scenario.name);
+      return { ...scenario, vehicles: scenarioVehicles.length };
+    });
+    setScenarios(scenariosWithVehicleCounts);
+  }, []); // Empty dependency array to ensure the effect runs only once
 
   const handleAddScenario = () => {
     navigate('/add-scenario');
@@ -110,7 +120,6 @@ function AllScenarios() {
                     <FontAwesomeIcon icon={faSave} onClick={() => handleSaveEdit(scenario.id)} className="action-icon save-icon" />
                     <FontAwesomeIcon icon={faTimes} onClick={handleCancelEdit} className="action-icon cancel-icon" />
                   </td>
-
                 </>
               ) : (
                 <>
